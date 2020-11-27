@@ -1,42 +1,50 @@
-import { BaseDatabase } from "./BaseDatabase";
+import BaseDataBase from "./BaseDatabase";
 import { User } from "../model/User";
 
+export class UserDataBase extends BaseDataBase {
 
+   protected tableName: string = "LAMA_TABELA_USER";
 
- class UserDatabase extends BaseDatabase {
+   private toModel(dbModel?: any): User | undefined {
+      return (
+         dbModel &&
+         new User(
+            dbModel.id,
+            dbModel.name,
+            dbModel.email,
+            dbModel.password,
+            dbModel.role
+         )
+      );
+   }
 
-  private static TABLE_NAME:string = "LAMA_TABELA_USER";
-  public getTableName = (): string => UserDatabase.TABLE_NAME
-  public async signup(
-    id: string,
-    email: string,
-    name: string,
-    password: string,
-    role: string
-  ): Promise<any> {
+   public async createUser(user: User): Promise<void> {
+      try {
+         await BaseDataBase.connection.raw(`
+            INSERT INTO ${this.tableName} (id, name, email, password, role)
+            VALUES (
+            '${user.getId()}', 
+            '${user.getName()}', 
+            '${user.getEmail()}',
+            '${user.getPassword()}', 
+            '${user.getRole()}'
+            )`
+         );
+      } catch (error) {
+         throw new Error(error.sqlMessage || error.message)
+      }
+   }
+
+   public async getUserByEmail(email: string): Promise<User | undefined> {
     try {
-      await this.getConnection()
-        .insert({
-          id,
-          email,
-          name,
-          password,
-          role
-        })
-        .into(UserDatabase.TABLE_NAME);
+       const result = await BaseDataBase.connection.raw(`
+          SELECT * from ${this.tableName} WHERE email = '${email}'
+       `);
+       return this.toModel(result[0][0]);
     } catch (error) {
-      throw new Error(error.sqlMessage || error.message);
+       throw new Error(error.sqlMessage || error.message)
     }
+ }
+
   }
-
-  public async getUserByEmail(email: string): Promise<User> {
-    const result = await this.getConnection()
-      .select("*")
-      .from(UserDatabase.TABLE_NAME)
-      .where({ email });
-
-    return User.toUserModel(result[0]);
-  }
-
-}
-export default new UserDatabase()
+  export default new UserDataBase()

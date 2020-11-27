@@ -35,7 +35,10 @@
     "@types/node": "^14.11.2",
     "@types/uuid": "^8.3.0",
     "ts-node-dev": "^1.0.0-pre.63",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.3",
+    "jest": "^26.0.1",
+    "ts-jest": "^26.1.0",
+    "@types/jest": "^25.2.3"
   },
   "bugs": {
     "url": "https://github.com/future4code/jackson-LAMA15/issues"

@@ -1,3 +1,5 @@
+import { CustomError } from "../errors/CustomError";
+
 export class User{
     constructor(
     private id: string,
@@ -47,23 +49,27 @@ export class User{
         this.role = role;
     }
 
-   static stringToUserRole(input: string): UserRole{
-        switch (input) {
-            case "NORMAL":
-              return UserRole.NORMAL;
-            case "ADMIN":
-              return UserRole.ADMIN;
-            default:
-              throw new Error("Invalid user role");
-          }
-    }
 
-    static toUserModel(user: any): User {
-        return new User(user.id, user.name, user.email, user.password, User.stringToUserRole(user.role));
-      }
-
+    // static toUserModel(user: any): User {
+    //     return new User(user.id, user.name, user.email, user.password, User.stringToUserRole(user.role));
+    //   }
 
 }
+
+export const stringToUserRole = (input: string): UserRole => {
+    switch (input) {
+      case "NORMAL":
+        return UserRole.NORMAL;
+      case "ADMIN":
+        return UserRole.ADMIN;
+      default:
+        throw new CustomError(422, "Invalid user role");
+    }
+
+    
+  };
+
+
 
 export interface UserInputDTO{
     email: string;
